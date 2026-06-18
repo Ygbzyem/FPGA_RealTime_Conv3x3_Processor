@@ -21,6 +21,9 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 
 | # | Module | File | Vai trò |
 |---|--------|------|---------|
-| 1 | `input_interface` | `top_module.v` | Module top cấp cao nhất, kết nối toàn bộ hệ thống lên FPGA |
+| 1 | `top_module` | `top_module.v` | Module top cấp cao nhất, kết nối toàn bộ hệ thống lên FPGA |
 | 2 | `line_buffer` | `line_buffer.v` | Lưu trữ 2 dòng dữ liệu ảnh. Đây là module cực kỳ quan trọng để chuyển đổi dữ liệu dạng chuỗi (serial) thành ma trận 3x3. |
-| 3 | `window_3x3` | `window_3x3.v` |Trích xuất cửa sổ 3x3 pixel (p11 đến p33) từ Line Buffer để đưa vào lõi xử lý Convolution. |
+| 3 | `window_3x3` | `window_3x3.v` |Trích xuất cửa sổ 3x3 pixel (p11 đến p33) từ Line Buffer để đưa vào lõi xử lý Convolution. 
+| 4 | `cnn_sharpening` | `cnn_sharpening.v` |Thực hiện phép nhân chập với Kernel làm sắc nét ảnh (Sharpening).
+| 5 | `cnn_blur` | `cnn_blur.v` |Thực hiện phép nhân chập với Kernel làm mờ ảnh (Blur).
+| 6 | `testbench_prj` | `testbench_prj.v` |Module dùng để mô phỏng, nạp ảnh từ Python và kiểm chứng dữ liệu đầu ra.
