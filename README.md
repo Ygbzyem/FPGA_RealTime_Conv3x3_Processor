@@ -38,6 +38,7 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 | 5 | `image_source/`  | Thư mục ảnh gốc | Chứa các ảnh mẫu (Input) và ảnh sau khi xử lý (Output). |
 
 ## 4. Chi tiết chân tín hiệu I/O từng module (Interface Specifications)
+### 4.1 `top_module`  
 ## 5. Luồng hoạt động hệ thống (System Workflow)
 
 ### 1. **Chuẩn bị và nạp dữ liệu (Input Stage)**
