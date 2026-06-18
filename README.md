@@ -31,7 +31,7 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 ## Danh sách tệp tin bổ trợ (External Files & Scripts)
 | # | Filename | Vai trò | Mô tả |
 |---|--------|------|---------|
-| 1 | `image_to_hex.py` | Tiền xử lý (Preprocessing) | Chuyển đổi ảnh 64x64 từ các định dạng thông thường (.jpg, .png) sang file .txt hoặc .hex chứa giá trị pixel để đưa vào testbench. |
+| 1 | `image_to_hex.py` | Tiền xử lý (Preprocessing) | Chuyển đổi ảnh 64x64 từ các định dạng thông thường (png) sang file .txt hoặc .hex chứa giá trị pixel để đưa vào testbench. |
 | 2 | `hex_to_image.py` | Hậu xử lý (Postprocessing) |Đọc file dữ liệu kết quả từ ModelSim, chuyển đổi lại thành mảng pixel và xuất ra file ảnh để so sánh chất lượng. |
 | 3 | `test_input.hex`  | Dữ liệu đầu vào | File chứa kết quả sau khi Convolution được ghi ra từ top_module trong quá trình mô phỏng. |
 | 4 | `ouput_data.hex` | Dữ liệu đầu ra | File chứa kết quả sau khi Convolution được ghi ra từ top_module trong quá trình mô phỏng. |
