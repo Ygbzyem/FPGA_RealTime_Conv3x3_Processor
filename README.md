@@ -49,3 +49,7 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 * **Đệm dữ liệu**: Module linerbuffer.v nhận các pixel đơn lẻ, lưu trữ và dịch chuyển chúng qua các tầng ghi để tạo ra 2 dòng đệm (Line buffers).
 * **Tạo cửa sổ 3x3**:  Module window_3x3.v lấy dữ liệu từ linerbuffer và pixel hiện tại để trích xuất ra một cửa sổ ma trận $3 \times 3$ (gồm 9 giá trị pixel p11 đến p33).
 * **Tính toán nhân chập**: Cửa sổ $3 \times 3$ này được gửi tới một trong hai module cnn_sharpening.v hoặc cnn_blur.v (tùy vào chế độ mode). Tại đây, các pixel sẽ được nhân với hệ số Kernel tương ứng và cộng dồn qua cấu trúc cây cộng (Adder Tree) để tạo ra pixel kết quả cuối cùng.
+
+### 3. **Xuất và Tái tạo ảnh (Output Stage)**
+* **Đồng bộ hoá**: Kết quả sau khi tính toán được đưa qua output_controller, tại đây tín hiệu data_valid_out được kích hoạt để báo hiệu rằng dữ liệu tại o_pixel đã sẵn sàng.
+* **Hậu xử lý (Python)**: Các giá trị pixel đầu ra được ghi lại vào file output_data.txt. Script hex_to_image.py sau đó sẽ đọc file này và tái tạo lại thành file ảnh kỹ thuật số để bạn có thể xem và so sánh trực quan.
