@@ -39,6 +39,11 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 
 ## 4. Chi tiết chân tín hiệu I/O từng module (Interface Specifications)
 ### 4.1 `top_module`  
+### 4.2 `line_buffer`
+### 4.3 `window_3x3`
+### 4.4 `cnn_sharpening`
+### 4.5 `cnn_blur` 
+
 ## 5. Luồng hoạt động hệ thống (System Workflow)
 
 ### 1. **Chuẩn bị và nạp dữ liệu (Input Stage)**
