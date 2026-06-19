@@ -42,14 +42,24 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 
 | # | Gate | Type | Bit-width | Mô tả |
 |---|--------|------|-----|----------|
-| 1 | `i_clk` | Input | 1-bit | Đóng vai trò là clock để chạy chương trình |
+| 1 | `i_clk` | Input | 1-bit | Xung clock hệ thống |
 | 2 | `i_reset` | Input | 1-bit | Có vai trò khởi động lại toàn bộ mạch (active-high) |
 | 3 | `i_pixel` | Input | 8-bit | Dữ liệu pixel đầu vào (grayscale) |
 | 4 | `data_valid_in` | Input | 1-bit | Báo hiệu dữ liệu đầu vào hợp lệ |
 | 5 | `mode` | Input | 1-bit | Chọn chế độ: 0 (Sharpen), 1 (Blur) |
 | 6 | `o_pixel` | Output | 8-bit | Kết quả pixel đã xử lý |
 | 7 | `data_valid_out` | Output | 1-bit | Báo hiệu dữ liệu đầu ra hợp lệ |
+
 ### 4.2 `line_buffer`
+| # | Gate | Type | Bit-width | Mô tả |
+|---|--------|------|-----|----------|
+| 1 | `i_clk` | Input | 1-bit | Xung clock hệ thống |
+| 2 | `i_reset` | Input | 1-bit | Có vai trò khởi động lại toàn bộ mạch (active-high) |
+| 3 | `i_pixel` | Input | 8-bit | Dữ liệu pixel đầu vào (grayscale) nhận từ `top_module` |
+| 4 | `q1` | Output | 8-bit | Dữ liệu hiện tại |
+| 4 | `q2` | Output | 8-bit | Dữ liệu dòng trên (đã trễ 1 dòng) |
+| 5 | `q3` | Output | 8-bit | Dữ liệu dòng dưới (đã trễ 2 dòng) |
+
 ### 4.3 `window_3x3`
 ### 4.4 `cnn_sharpening`
 ### 4.5 `cnn_blur` 
