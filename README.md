@@ -41,7 +41,7 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 ### 4.1 `top_module`  
 
 | # | Gate | Type | Bit-width | Mô tả |
-|---|--------|------|---------|--------|
+|---|--------|------|-----|----------|
 | 1 | `i_clk` | Input | 2 | Đóng vai trò là clock để chạy chương trình |
 ### 4.2 `line_buffer`
 ### 4.3 `window_3x3`
