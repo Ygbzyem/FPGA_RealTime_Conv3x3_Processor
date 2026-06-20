@@ -1,4 +1,4 @@
-<img width="1893" height="868" alt="image" src="https://github.com/user-attachments/assets/9d6a0279-38a4-4c56-ab6b-2b47f1ebfde8" /># FPGA_RealTime_Conv3x3_Processor
+# FPGA_RealTime_Conv3x3_Processor
 
 --- 
 
