@@ -15,7 +15,7 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 
 ## 2. Sơ đồ khối tổng quát
 
-<img width="5096" height="3839" alt="image" src="https://github.com/AnhBaChaCuu/FPGA_RealTime_Conv3x3_Processor/blob/e1a4c9134abc59d65a1c13a32b5c7f85ea139965/Block_Diagram.png" />
+<img width="5096" height="3839" alt="image" src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/Block_Diagram.png?raw=true" />
 
 ## 3. Mục lục các module (Module Index)
 
