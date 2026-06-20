@@ -163,6 +163,8 @@ Sau khi mô phỏng hoàn tất, file dữ liệu đầu ra được script Pyth
     </td>
   </tr>
 </table>
+
 ----
+
 ## 7. Đánh giá và Nhận xét (Evaluation & Analysis)
 Dựa trên kết quả mô phỏng phần cứng thu được và hình ảnh tái tạo qua script Python, hệ thống xử lý ảnh nhân chập $3 \times 3$ trên FPGA đạt được các kết quả thực nghiệm sau:
