@@ -98,6 +98,7 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 <img width="5096" height="3839" alt="image" src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/workflow1.png?raw=true" /> 
 
 ***Ảnh test được bỏ vào tệp có chứa 2 file python dùng để chuyển đổi dữ liệu ảnh***
+
 ----
 
 <img width="5096" height="3839" alt="image" src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/workflow2.png?raw=true" /> 
