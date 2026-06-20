@@ -152,12 +152,12 @@ Sau khi mô phỏng hoàn tất, file dữ liệu đầu ra được script Pyth
   </tr>
   <tr>
     <td align="center">
-      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/ouput_sharpen.png?raw=true" width="350" alt="Ảnh gốc Input"/>
+      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/output_sharpen.png?raw=true" width="350" alt="Ảnh gốc Input"/>
       <br>
       <b>Kết quả sau bộ lọc <i>Sharpening</i> (FPGA)</b> 
     </td>
     <td align="center">
-      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/ouput_blur.png?raw=true" width="350" alt="Kết quả Blur"/>
+      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/output_blur.png?raw=true" width="350" alt="Kết quả Blur"/>
       <br>
       <b>Kết quả sau bộ lọc <i>Blurring</i> (FPGA)</b>
     </td>
