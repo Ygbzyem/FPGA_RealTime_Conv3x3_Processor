@@ -1,4 +1,4 @@
-# FPGA_RealTime_Conv3x3_Processor
+<img width="1893" height="868" alt="image" src="https://github.com/user-attachments/assets/9d6a0279-38a4-4c56-ab6b-2b47f1ebfde8" /># FPGA_RealTime_Conv3x3_Processor
 
 --- 
 
@@ -124,5 +124,8 @@ Hệ thống được thiết kế để xử lý ảnh theo quy trình thời g
 ### 1. **Kết quả Waveform (Waveform Result)**
 Hình dưới đây thể hiện sự phối hợp nhịp nhàng giữa các tín hiệu điều khiển và dữ liệu:
 
+<img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/waveform1.png?raw=true" width="45%" align="left" alt="Ảnh 1" />
+<img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/waveform2.png?raw=true" width="45%" alt="Ảnh 2" />
+<div style="clear: both;"></div>
 
 
