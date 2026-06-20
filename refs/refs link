@@ -1,4 +1,0 @@
-
-* **[1] Verilog HDL Simulation:** [ModelSim SE User's Manual](https://www.microsemi.com/document-portal/doc_view/131617-modelsim-user-manual) - Hướng dẫn chi tiết về các tập lệnh và cách tối ưu hóa mô phỏng trên ModelSim.
-* **[2] Thuật toán xử lý ảnh:** [Image Processing Basics - Kernel Convolution](https://en.wikipedia.org/wiki/Kernel_(image_processing)) - Lý thuyết toán học về ma trận nhân chập $3 \times 3$, các bộ lọc Blurring và Sharpening.
-* **[3] Tài liệu phần cứng:** [FPGA Real-Time Image Processing Architectures](https://ieeexplore.ieee.org/) - Các cấu trúc tối ưu cho Line Buffer và Window 3x3 khi xử lý luồng dữ liệu thời gian thực.
