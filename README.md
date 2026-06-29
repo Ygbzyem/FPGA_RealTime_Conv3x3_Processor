@@ -5,6 +5,11 @@
 
 This project focuses on the design and implementation of a real-time image processor on an FPGA. The system utilizes a 3x3 Convolution algorithm to perform common image filters such as Blur and Sharpening. The system is optimized using a Pipeline architecture and an Adder Tree to achieve high processing speed, ensuring each pixel is processed in every clock cycle.
 
+### 1.2 Objective
+- Understand how 3x3 convolution work.
+- How RTL in Modelsim work.
+- How different kernels can create different images.
+
 ## 2. System Overview
 The system is designed to process images in a real-time pipeline. The data flow operates as follows:
 
