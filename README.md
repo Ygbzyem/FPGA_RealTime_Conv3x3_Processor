@@ -177,3 +177,9 @@ Based on the hardware simulation results obtained and the images reconstructed v
 * **System Accuracy and Synchronization**: The data flow control signals (`data_valid_in` and `data_valid_out`) operate perfectly under the `i_clk` clock cycle. The image does not suffer from linear distortion or row/column misalignment, affirming that the pixel sliding address management of the `linerbuffer` and `window_3x3` modules is completely synchronized, with no data loss occurring at the boundary pixels.
 
 ## 9. Future Work
+
+- Gaussian Filter
+- Sobel Edge Detection
+- Configurable Convolution Kernel
+- RGB Image Support
+- Better Verification
