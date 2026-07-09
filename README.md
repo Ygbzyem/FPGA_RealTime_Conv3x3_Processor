@@ -19,6 +19,12 @@ The system is designed to process images in a real-time pipeline. The data flow 
 
 * **Output:** The processed pixel result is output from the `top_module` as raw data, which is then captured by another Python script and reconstructed into a viewable image file.
 
+### Limitations
+
+* Verified via RTL simulation only (ModelSim); not yet deployed on physical FPGA hardware.
+* Kernel coefficients are hardcoded (not runtime-configurable).
+* Tested on 64x64 grayscale images only; RGB and larger resolutions not yet supported.
+
 ## 3. General Block Diagram
 
 <img width="5096" height="3839" alt="image" src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/Block_Diagram.png?raw=true" />
@@ -39,9 +45,9 @@ The system is designed to process images in a real-time pipeline. The data flow 
 |---|--------|------|---------|
 | 1 | `image_to_hex.py` | Preprocessing | Converts a 64x64 image from common formats (png) to a .txt or .hex file containing pixel values for the testbench. |
 | 2 | `hex_to_image.py` | Postprocessing | Reads the output data file from ModelSim, converts it back into a pixel array, and exports it as an image file for quality comparison. |
-| 3 | `test_input.hex`  | Input Data | File containing the result after Convolution written from the `top_module` during simulation. |
-| 4 | `ouput_data.hex` | Output Data | File containing the result after Convolution written from the `top_module` during simulation. |
-| 5 | `image_source/`  | Original Image Folder | Contains sample images (Input) and processed images (Output). |
+| 3 | `input_data.hex`  | Input Data | File containing the result after Convolution written from the `top_module` during simulation. |
+| 4 | `ouput_data.hex (blur and sharp)` | Output Data | File containing the result after Convolution written from the `top_module` during simulation. |
+| 5 | `image/`  | Original Image Folder | Contains sample images (Input) and processed images (Output). |
 
 ## 5. Interface Specifications
 ### 5.1 `top_module`  
@@ -113,7 +119,7 @@ The system is designed to process images in a real-time pipeline. The data flow 
 * **Data Loading**: During simulation (`testbench_prj.v`), this `.hex` file is read and sequentially pushes each pixel through the `i_pixel` port of the `top_module` at every positive clock edge (`posedge i_clk`). * _Line 46 in the `testbench_prj.v` file_
 
 ### 2. **Processing Stage**
-* **Data Buffering**: The `linerbuffer.v` module receives single pixels, stores, and shifts them through register stages to create 2 line buffers.
+* **Data Buffering**: The `line_buffer.v` module receives single pixels, stores, and shifts them through register stages to create 2 line buffers.
 * **3x3 Window Generation**: The `window_3x3.v` module takes data from the linebuffer and the current pixel to extract a $3 \times 3$ matrix window (consisting of 9 pixel values `p11` to `p33`).
 * **Convolution Calculation**: This $3 \times 3$ window is sent to either the `cnn_sharpening.v` or `cnn_blur.v` module (depending on the `mode`). Here, the pixels are multiplied by the corresponding Kernel coefficients and accumulated through an Adder Tree structure to generate the final resulting pixel.
 
