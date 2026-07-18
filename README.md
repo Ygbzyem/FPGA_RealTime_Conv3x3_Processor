@@ -149,24 +149,37 @@ The system is designed to process images in a real-time pipeline. The data flow 
 
 ## 7. Simulation & Verification
 
-### 1. **Waveform Result**
-
-[![Image 1](https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/raw/main/image/waveform1.png?raw=true)](https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/waveform1.png?raw=true)
-
-[![Image 2](https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/raw/main/image/waveform2.png?raw=true)](https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/waveform2.png?raw=true)
-
-- **`i_clk` / `i_reset`**: Source signals controlling the entire synchronous state of the integrated circuit.
-- **`data_valid_in`**: Activated (*High*) to signal that the input pixel stream has started "flowing" into the `line_buffer` module.
-- **`p11` to `p33`**: The values of 9 consecutive pixels successfully extracted to form a 3x3 sliding window at each clock cycle.
-- **`o_pixel`**: The resulting output pixel after passing through the optimized **Adder Tree** structure.
-- **`data_valid_out`**: This signal transitions to a high level (*High*) to indicate that the output pixel is stable and valid, ready to be recorded.
-
-### 2. **Visual Results**
+### 1. **Visual Results**
 
 After the simulation is complete, the output data file is read by the Python script `hex_to_image.py` and reconstructed into a digital image structure for visual comparison:
 
-- Original Input Image / Grayscale Input Image
-- Sharpen Result / Blur Result
+<table>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/input_original.png?raw=true" width="350" alt="Original Input Image"/>
+      <br>
+      <b>Original Image (Input - Original)</b>
+    </td>
+    <td align="center">
+      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/input_grayscale.png?raw=true" width="350" alt="Grayscale Input Image"/>
+      <br>
+      <b>Original Image (Input - Grayscale 64x64)</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/output_sharpen.png?raw=true" width="350" alt="Sharpen Result"/>
+      <br>
+      <b>Result after <i>Sharpening</i> filter (FPGA)</b> 
+    </td>
+    <td align="center">
+      <img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/output_blur.png?raw=true" width="350" alt="Blur Result"/>
+      <br>
+      <b>Result after <i>Blurring</i> filter (FPGA)</b>
+    </td>
+  </tr>
+</table>
+
 
 ### 3. **Regression / Equivalence Verification (new in v2.0.0)**
 
