@@ -39,7 +39,7 @@ window_3x3 window_inst (
         .p31(p31), .p32(p32), .p33(p33)
     );
 
-conv_multi conv_multi_inst (
+conv_systolic conv_systolic_inst (
         .i_clk(i_clk),
         .i_reset(i_reset),
         .data_valid_in(data_valid_in),

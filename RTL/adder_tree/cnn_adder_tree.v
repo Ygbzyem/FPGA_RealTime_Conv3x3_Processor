@@ -1,4 +1,4 @@
-module conv_multi (
+module conv_adder_tree (
 input i_clk,
 input i_reset,
 input data_valid_in,
