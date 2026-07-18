@@ -269,12 +269,12 @@ where **WNS (Worst Negative Slack)** is read directly from the Design Timing Sum
 
 | Metric | Adder Tree (`conv_multi.v`) | Systolic Array (`conv_systolic.v`) |
 |---|---|---|
-| LUT | *(điền số liệu)* | *(điền số liệu)* |
-| FF (Flip-Flop) | *(điền số liệu)* | *(điền số liệu)* |
-| DSP | *(điền số liệu)* | *(điền số liệu)* |
-| Clock Period used for measurement | 5.500 ns | *(điền số liệu)* |
-| WNS at that period | 0.150 ns | *(điền số liệu)* |
-| **Fmax** | **≈ 186.9 MHz** | *(điền số liệu)* |
+| LUT | 201 | 579 |
+| FF (Flip-Flop) | 259 | 478 |
+| DSP | 1| 1 |
+| Clock Period used for measurement | 5.500 ns | 5.500 ns |
+| WNS at that period | 0.150 ns | 0.133 ns |
+| **Fmax** | **≈ 186.9 MHz** | **≈ 186.3 MHz** |
 | Pipeline Latency | 3 clock cycles | 10 clock cycles |
 
 ### 9.3 Verification Results
