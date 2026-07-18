@@ -23,11 +23,7 @@ always @(posedge i_clk or posedge i_reset) begin
             mult11 <= 16'd0; mult12 <= 16'd0; mult13 <= 16'd0;
             mult21 <= 16'd0; mult22 <= 16'd0; mult23 <= 16'd0;
             mult31 <= 16'd0; mult32 <= 16'd0; mult33 <= 16'd0;
-	    sum_p    <= 16'd0;
-            o_pixel <= 8'd0;
             delay_valid_1  <= 1'b0;
-            delay_valid_2  <= 1'b0;
-            data_valid_out <= 1'b0;
 end
 	else if(data_valid_in) begin
 

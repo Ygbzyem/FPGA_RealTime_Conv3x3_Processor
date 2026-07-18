@@ -25,11 +25,7 @@ always @(posedge i_clk or posedge i_reset) begin
             mult12 <= 16'd0;
             mult21 <= 16'd0; mult22 <= 16'd0; mult23 <= 16'd0;
             mult32 <= 16'd0;
-	    sum_p    <= 16'd0;
-            o_pixel <= 8'd0;
             delay_valid_1  <= 1'b0;
-            delay_valid_2  <= 1'b0;
-            data_valid_out <= 1'b0;
 end
 	else if (data_valid_in) begin
 mult12 <= $signed({1'b0, p12}) * -8'sd1;
@@ -53,7 +49,7 @@ end
 always @(posedge i_clk or posedge i_reset) begin
 	if(i_reset) begin
 sum_p <= 19'd0;
-delay_valid_2 = 1'b0;
+delay_valid_2 <= 1'b0;
 end
 	else if(delay_valid_1) begin
 sum_p <= mult12 + mult21 + mult22 + mult23 + mult32;
@@ -68,8 +64,8 @@ end
 
 always @(posedge i_clk or posedge i_reset) begin
 	if(i_reset) begin
-o_pixel = 8'd0;
-data_valid_out = 1'b0;
+o_pixel <= 8'd0;
+data_valid_out <= 1'b0;
 end
 	else if(delay_valid_2)begin
 if( sum_p < 0) begin
