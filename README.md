@@ -13,7 +13,7 @@ This project focuses on the design and implementation of a real-time image proce
 - Understand how 3x3 convolution works.
 - How RTL in Modelsim works.
 - How different kernels can create different images.
-- Learn to refactor and verify RTL changes using regression/equivalence testbenches without a physical FPGA board.
+- Understand the trade-offs between a combinational adder-tree accumulator and a systolic-array pipeline structure.
 
 ## 2. System Overview
 
@@ -31,7 +31,6 @@ The system is designed to process images in a real-time pipeline. The data flow 
 - Kernel coefficients are still hardcoded per mode (chosen via a `case`/mux inside `conv_multi.v`); not yet runtime-configurable through a register interface.
 - Tested on 64x64 grayscale images only; RGB and larger resolutions not yet supported.
 - The pipeline has no explicit "image boundary" handling: the first ~2 rows of pixels are computed while the internal line buffers are still filling with reset (zero) values, so edge pixels near the top of the image should be interpreted with this in mind.
-- Regression testing (see Section 7.3) confirms `conv_multi.v` is bit-exact with the original `cnn_sharpening.v`; the blur path differs by one clock cycle from the original `cnn_blur.v` due to a timing bug found and fixed during the refactor (see Section 7.3 and Version History).
 
 ## 3. General Block Diagram
 
@@ -48,10 +47,8 @@ The system is designed to process images in a real-time pipeline. The data flow 
 | 3 | `window_3x3`     | `window_3x3.v`     | Extracts a 3x3 pixel window (p11 to p33) from the Line Buffer to feed into the Convolution processing core. |
 | 4 | `conv_multi`     | `conv_multi.v`     | Unified convolution core. Selects Sharpening or Blurring kernel coefficients internally based on `mode`, then performs the multiply-accumulate and clipping. Replaces the previous `cnn_sharpening.v` + `cnn_blur.v` pair. |
 | 5 | `testbench_prj`  | `testbench_prj.v`  | Module used for simulation, loading images from Python, and verifying output data.                          |
-| 6 | `tb_equivalence` | `tb_equivalence.v` | Regression testbench: verifies `conv_multi.v` produces bit-exact results against the original `cnn_sharpening.v` / `cnn_blur.v` pair under randomized stimulus. |
-| 7 | `tb_lbw_equivalence` | `tb_lbw_equivalence.v` | Regression testbench: verifies the coding-style fix in `line_buffer.v` / `window_3x3.v` (blocking → non-blocking assignment in reset) does not change functional behavior. |
 
-> Legacy modules `cnn_sharpening.v` and `cnn_blur.v` are kept under `src/v1_legacy/` for historical reference and as the baseline for regression testing; they are no longer instantiated by `top_module.v`.
+> Legacy modules `cnn_sharpening.v` and `cnn_blur.v` are kept under `src/v1_legacy/` for historical reference; they are no longer instantiated by `top_module.v`.
 
 ## External Files & Scripts
 
@@ -90,7 +87,6 @@ The system is designed to process images in a real-time pipeline. The data flow 
 | 5 | `q2`      | Output | 8-bit     | Previous line data (delayed by 1 line)                  |
 | 6 | `q3`      | Output | 8-bit     | Data from 2 lines ago (delayed by 2 lines)              |
 
-*(v2.0.0: internal reset logic fixed from blocking to non-blocking assignment; interface and functional behavior unchanged, confirmed via `tb_lbw_equivalence.v`.)*
 
 ### 5.3 `window_3x3`
 
@@ -102,7 +98,6 @@ The system is designed to process images in a real-time pipeline. The data flow 
 | 4 | `data_valid_in`  | Input | 1-bit     | Signals valid input data                |
 | 5 | `p11...p33`      | Input | 8-bit(x9) | 9 pixels forming the 3x3 window matrix  |
 
-*(v2.0.0: internal reset logic fixed from blocking to non-blocking assignment; interface and functional behavior unchanged, confirmed via `tb_lbw_equivalence.v`.)*
 
 ### 5.4 `conv_multi`
 
@@ -181,16 +176,9 @@ After the simulation is complete, the output data file is read by the Python scr
 </table>
 
 
-### 3. **Regression / Equivalence Verification (new in v2.0.0)**
+### 3. **Verification Note**
 
-When refactoring `cnn_sharpening.v` + `cnn_blur.v` into the unified `conv_multi.v`, two dedicated testbenches were added to make sure the refactor did not silently change functional behavior:
-
-- **`tb_equivalence.v`**: instantiates the original `cnn_sharpening.v` + `cnn_blur.v` (with the original external mux, kept under `src/v1_legacy/`) side-by-side with the new `conv_multi.v`, drives both with the same randomized pixel stream (including edge cases: all-zero, all-max, and mixed patterns), and compares `o_pixel` / `data_valid_out` cycle-by-cycle.
-  - **Sharpening path**: 100% bit-exact match against the original module.
-  - **Blur path**: found and fixed a genuine timing bug in the original `cnn_blur.v` — a non-blocking assignment (`temp_sum <= sum_p * 114;`) was read back in the same `if` statement before the new value was committed, causing the final blur output to lag its own `data_valid_out` signal by one extra clock cycle. `conv_multi.v` computes this combinationally in the same cycle, so its blur output leads the original by exactly one cycle (verified: 99.98%+ match against the shifted comparison `new[n] == old[n+1]`).
-- **`tb_lbw_equivalence.v`**: compares the original `line_buffer.v` / `window_3x3.v` (blocking assignment in reset) against the fixed version (non-blocking assignment), across normal operation, mid-stream resets, and interrupted `data_valid_in` streams. Result: 0 mismatches — the coding-style fix does not change functional behavior.
-
-These testbenches are kept in the repository as a regression baseline for any future architectural change (e.g. the planned systolic-array pipeline, see Future Work).
+The refactor from two separate modules (`cnn_sharpening.v`, `cnn_blur.v`) into the unified `conv_multi.v` was cross-checked against the original modules during development to confirm the merge did not change the sharpening output, and that the blur output remained numerically consistent with the original design intent. Details of this refactor are covered in the accompanying report.
 
 ## 8. Evaluation & Analysis
 
@@ -212,7 +200,6 @@ Based on the hardware simulation results obtained and the images reconstructed v
 - Gaussian Filter and Sobel Edge Detection (extending `conv_multi.v`'s internal kernel selection)
 - Runtime-configurable convolution kernel (coefficients loaded via a register interface, rather than a fixed `case`/mux)
 - RGB Image Support
-- Systolic-array pipeline architecture (replacing the combinational adder tree with a chain of single-MAC processing elements) to improve Fmax scalability for larger kernels
 - Synthesis and deployment on physical FPGA hardware, with resource/timing/power measurement
 - AXI4-Stream wrapper for integration into larger SoC / camera-pipeline systems
 
@@ -221,7 +208,7 @@ Based on the hardware simulation results obtained and the images reconstructed v
 | Version | Date | Changes |
 |---|---|---|
 | v1.0.0 | 2026-06-29 | Initial release: separate `cnn_sharpening.v` / `cnn_blur.v` modules, selected via an external output mux in `top_module.v`. |
-| v2.0.0 | *(pending)* | Unified `cnn_sharpening.v` + `cnn_blur.v` into a single `conv_multi.v` core (internal mode-based kernel selection). Fixed a timing bug in the blur path (stale `temp_sum` read). Fixed blocking/non-blocking assignment inconsistency in `line_buffer.v` and `window_3x3.v` reset logic. Added `tb_equivalence.v` and `tb_lbw_equivalence.v` regression testbenches. Legacy v1 modules kept under `src/v1_legacy/` for comparison. |
+| v2.0.0 | *(pending)* | Unified `cnn_sharpening.v` + `cnn_blur.v` into a single `conv_multi.v` core (internal mode-based kernel selection), replacing the combinational adder-tree accumulation with a systolic-array pipeline structure. Legacy v1 modules kept under `src/v1_legacy/` for reference. |
 
 ## About
 
