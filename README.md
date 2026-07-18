@@ -23,18 +23,18 @@ Both architectures are functionally equivalent (produce the same convolution res
 
 ## Table of Contents
 
-1. [Project Description](#1-project-description)
-2. [System Overview](#2-system-overview)
-3. [General Block Diagram](#3-general-block-diagram)
-4. [Repository Structure](#4-repository-structure)
-5. [Module Index](#5-module-index)
-6. [Interface Specifications](#6-interface-specifications)
-7. [System Workflow](#7-system-workflow)
-8. [Verification Methodology](#8-verification-methodology)
-9. [Experimental Results](#9-experimental-results)
-10. [Comparison & Trade-off Discussion](#10-comparison--trade-off-discussion)
-11. [Limitations](#11-limitations)
-12. [Future Work](#12-future-work)
+* [Project Description](#1-project-description)
+* [System Overview](#2-system-overview)
+* [General Block Diagram](#3-general-block-diagram)
+* [Repository Structure](#4-repository-structure)
+* [Module Index](#5-module-index)
+* [Interface Specifications](#6-interface-specifications)
+* [System Workflow](#7-system-workflow)
+* [Verification Methodology](#8-verification-methodology)
+* [Experimental Results](#9-experimental-results)
+* [Comparison & Trade-off Discussion](#10-comparison--trade-off-discussion)
+* [Limitations](#11-limitations)
+* [Future Work](#12-future-work)
 
 ---
 
@@ -51,9 +51,7 @@ The system processes a 64x64 grayscale image through a real-time streaming pipel
 
 ## 3. General Block Diagram
 
-<!-- Dan anh block diagram tong quat (line_buffer -> window_3x3 -> convolution core -> output) vao day.
-     Chi can doi ten file duoi day thanh dung ten anh cua ban, vd: image/block_diagram.png -->
-![System Block Diagram](image/TEN_ANH_BLOCK_DIAGRAM.png)
+![System Block Diagram](image/Block_Diagram.png)
 
 ---
 
@@ -117,8 +115,7 @@ FPGA_RealTime_Conv3x3_Processor/
 
 ### 6.1 `top_module`
 
-<!-- Dan anh cau truc/so do cua top_module vao day, doi ten file cho khop -->
-![top_module structure](image/TEN_ANH_TOP_MODULE.png)
+![top_module structure](image/top_module.png)
 
 | # | Gate             | Type   | Bit-width | Description                             |
 | --- | ---------------- | ------ | --------- | ---------------------------------------- |
@@ -132,8 +129,7 @@ FPGA_RealTime_Conv3x3_Processor/
 
 ### 6.2 `line_buffer`
 
-<!-- Dan anh cau truc/so do cua line_buffer vao day, doi ten file cho khop -->
-![line_buffer structure](image/TEN_ANH_LINE_BUFFER.png)
+![line_buffer structure](image/line_buffer_module.png)
 
 | # | Gate      | Type   | Bit-width | Description                                             |
 | --- | --------- | ------ | --------- | -------------------------------------------------------- |
@@ -146,8 +142,7 @@ FPGA_RealTime_Conv3x3_Processor/
 
 ### 6.3 `window_3x3`
 
-<!-- Dan anh cau truc/so do cua window_3x3 vao day, doi ten file cho khop -->
-![window_3x3 structure](image/TEN_ANH_WINDOW_3X3.png)
+![window_3x3 structure](image/window_3x3_module.png)
 
 | # | Gate             | Type  | Bit-width | Description                             |
 | --- | ---------------- | ----- | --------- | ---------------------------------------- |
@@ -163,7 +158,6 @@ The convolution core is the only stage that differs between the two architecture
 
 #### 6.4.1 Adder Tree — `conv_multi.v`
 
-<!-- Dan anh so do khoi cua conv_multi (adder tree) vao day, doi ten file cho khop -->
 ![conv_multi (Adder Tree) structure](image/TEN_ANH_CONV_MULTI.png)
 
 | # | Gate             | Type   | Bit-width | Description                                      |
@@ -180,8 +174,6 @@ The convolution core is the only stage that differs between the two architecture
 
 #### 6.4.2 Systolic Array
 
-<!-- Dan anh so do tong quat cua kien truc systolic (chuoi 9 PE noi tiep) vao day, doi ten file cho khop -->
-![Systolic Array overview](image/TEN_ANH_SYSTOLIC_OVERVIEW.png)
 
 **How it works:** instead of summing all 9 terms in one cycle, the accumulation is broken into a chain of 9 Processing Elements (PE). Each PE performs exactly one multiply and one add per clock cycle, then registers the partial sum before passing it to the next PE. Because a new 3x3 window arrives every clock cycle (not every 9 cycles), each pixel/mode/valid signal must be delayed by an amount matching its position in the chain (handled by `shift_delay.v`) so that every PE always operates on data from the *same* window. Total pipeline latency: **10 clock cycles** (9 PE stages + 1 final output/clipping stage).
 
