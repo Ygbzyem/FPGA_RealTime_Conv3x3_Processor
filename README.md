@@ -133,20 +133,7 @@ The system is designed to process images in a real-time pipeline. The data flow 
 
 ## 7. Simulation & Verification
 
-### 1. **Waveform Result**
-The figure below demonstrates the seamless coordination between control signals and data:
-
-<img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/waveform1.png?raw=true" width="45%" align="left" alt="Image 1" />
-<img src="https://github.com/LoVuongChiTon67/FPGA_RealTime_Conv3x3_Processor/blob/main/image/waveform2.png?raw=true" width="45%" alt="Image 2" />
-<div style="clear: both;"></div>
-
-* **`i_clk` / `i_reset`**: Source signals controlling the entire synchronous state of the integrated circuit.
-* **`data_valid_in`**: Activated (*High*) to signal that the input pixel stream has started "flowing" into the `linerbuffer` module.
-* **`p11` to `p33`**: The values of 9 consecutive pixels successfully extracted to form a $3 \times 3$ sliding window at each clock cycle.
-* **`o_pixel`**: The resulting output pixel after passing through the optimized **Adder Tree** structure.
-* **`data_valid_out`**: This signal transitions to a high level (*High*) to indicate that the output pixel is stable and valid, ready to be recorded.
-
-### 2. **Visual Results**
+### 1. **Visual Results**
 After the simulation is complete, the output data file is read by the Python script `hex_to_image.py` and reconstructed into a digital image structure for visual comparison:
 
 <table>
