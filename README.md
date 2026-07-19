@@ -172,7 +172,7 @@ The convolution core is the only stage that differs between the two architecture
 
 #### 6.4.1 Adder Tree — `conv_adder_tree.v`
 
-![conv_adder_tree structure](image/TEN_ANH_CONV_MULTI.png)
+![conv_adder_tree structure](image/adder_tree_block_diagram.png)
 
 | # | Gate             | Type   | Bit-width | Description                                      |
 | --- | ---------------- | ------ | --------- | -------------------------------------------------- |
@@ -188,13 +188,12 @@ The convolution core is the only stage that differs between the two architecture
 
 #### 6.4.2 Systolic Array
 
-![Systolic Array overview](image/TEN_ANH_SYSTOLIC_OVERVIEW.png)
+![Systolic Array overview](image/systolic_array_block_diagram.png)
 
 **How it works:** instead of summing all 9 terms in one cycle, the accumulation is broken into a chain of 9 Processing Elements (PE). Each PE performs exactly one multiply and one add per clock cycle, then registers the partial sum before passing it to the next PE. Because a new 3x3 window arrives every clock cycle (not every 9 cycles), each pixel/mode/valid signal must be delayed by an amount matching its position in the chain (handled by `shift_delay.v`) so that every PE always operates on data from the *same* window. Total pipeline latency: **10 clock cycles** (9 PE stages + 1 final output/clipping stage).
 
 ##### 6.4.2.1 `conv_systolic.v`
 
-![conv_systolic.v structure](image/TEN_ANH_CONV_SYSTOLIC.png)
 
 | # | Gate             | Type   | Bit-width | Description                                      |
 | --- | ---------------- | ------ | --------- | -------------------------------------------------- |
@@ -208,7 +207,6 @@ The convolution core is the only stage that differs between the two architecture
 
 ##### 6.4.2.2 `systolic_pe.v`
 
-![systolic_pe.v structure](image/TEN_ANH_SYSTOLIC_PE.png)
 
 | # | Gate                 | Type   | Bit-width         | Description                                                        |
 | --- | -------------------- | ------ | ----------------- | -------------------------------------------------------------------- |
@@ -222,7 +220,6 @@ The convolution core is the only stage that differs between the two architecture
 
 ##### 6.4.2.3 `shift_delay.v`
 
-![shift_delay.v structure](image/TEN_ANH_SHIFT_DELAY.png)
 
 | # | Gate       | Type   | Bit-width       | Description                                          |
 | --- | ---------- | ------ | --------------- | ------------------------------------------------------ |

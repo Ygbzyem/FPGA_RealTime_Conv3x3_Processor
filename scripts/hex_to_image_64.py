@@ -16,4 +16,5 @@ def hex_to_image(hex_file, output_image):
     print(f"Đã convert thành công sang file: {output_image}")
 
 # Chạy lệnh
-hex_to_image('output_sharp.hex', 'ouput_sharpen.png')
+hex_to_image('output_blur_64.hex', 'ouput_blur_64.png')
+hex_to_image('output_sharp_64.hex', 'ouput_sharp_64.png')

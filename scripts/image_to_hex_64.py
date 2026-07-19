@@ -16,10 +16,10 @@ def generate_hex_file(image_path, output_hex_name, size=(64, 64)):
                 f.write(f"{pixel:02x}\n")
     
 
-    cv2.imwrite("grayscale_preview.png", resized_img)
+    cv2.imwrite("64_grayscale_preview.png", resized_img)
     print(f"Thành công! Đã tạo file: {output_hex_name}")
     print(f"Kích thước ảnh: {size[0]}x{size[1]} = {size[0]*size[1]} pixels.")
 
 
 # Thay 'input.jpg' bằng tên file ảnh của bạn
-generate_hex_file('test.png', 'input_data.hex', size=(64, 64))
+generate_hex_file('test.png', 'input_data_64.hex', size=(64, 64))
