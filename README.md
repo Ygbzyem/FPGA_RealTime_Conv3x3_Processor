@@ -30,11 +30,10 @@ Both architectures are functionally equivalent (produce the same convolution res
 * [Module Index](#5-module-index)
 * [Interface Specifications](#6-interface-specifications)
 * [System Workflow](#7-system-workflow)
-* [Verification Methodology](#8-verification-methodology)
-* [Experimental Results](#9-experimental-results)
-* [Comparison & Trade-off Discussion](#10-comparison--trade-off-discussion)
-* [Limitations](#11-limitations)
-* [Future Work](#12-future-work)
+* [Experimental Results](#8-experimental-results)
+* [Comparison & Trade-off Discussion](#9-comparison--trade-off-discussion)
+* [Limitations](#10-limitations)
+* [Future Work](#11-future-work)
 
 ---
 
@@ -156,7 +155,7 @@ FPGA_RealTime_Conv3x3_Processor/
 
 The convolution core is the only stage that differs between the two architectures compared in this project. Both versions share the exact same external interface (`i_clk`, `i_reset`, `data_valid_in`, `mode`, `p11...p33` → `o_pixel`, `data_valid_out`), so either can be instantiated in `top_module.v` without changing any other module.
 
-#### 6.4.1 Adder Tree — `conv_multi.v`
+#### 6.4.1 Adder Tree — `conv_adder_tree.v`
 
 ![conv_multi (Adder Tree) structure](image/TEN_ANH_CONV_MULTI.png)
 
@@ -241,19 +240,9 @@ The convolution core is the only stage that differs between the two architecture
 
 ---
 
-## 8. Verification Methodology
+## 8. Experimental Results
 
-Before comparing hardware resource usage and timing between the two architectures, both were verified against an independent software reference ("golden model") to confirm they compute the mathematically correct convolution result, not just that they compile and simulate without errors.
-
-- **Golden Model (`golden_model.py`):** A Python/NumPy implementation of the same fixed-point convolution algorithm (kernel coefficients, accumulator width, clipping, and the blur approximation `sum × 114 >> 10`), used to generate a reference output for a given input image.
-- **Test Vectors:** A set of patterns designed to expose specific classes of bugs — all-zero, all-max (saturation), checkerboard (window ordering), single-impulse (kernel coefficient correctness), corner cases (boundary/zero-padding behavior), and random images.
-- **Procedure:** for each architecture, the RTL simulation output (`output_data.hex`) is compared pixel-by-pixel against the golden model's output using match rate, PSNR, and SSIM.
-
----
-
-## 9. Experimental Results
-
-### 9.1 Timing Methodology
+### 8.1 Timing Methodology
 
 Fmax is derived from Vivado's Timing Summary report after implementation, using:
 
@@ -263,58 +252,57 @@ Fmax = 1 / (Clock Period − WNS)
 
 where **WNS (Worst Negative Slack)** is read directly from the Design Timing Summary. The clock period constraint was iteratively tightened until WNS approached zero, to obtain an accurate Fmax estimate rather than relying on a single loosely-constrained run.
 
-### 9.2 Resource & Timing Comparison
+### 8.2 Adder Tree (`conv_multi.v`)
 
-<!-- Dien so lieu that tu Vivado Report Utilization / Report Timing Summary vao bang duoi day -->
+| Image Size | LUT | FF | DSP | WNS (ns) | Fmax (MHz) |
+|---|---|---|---|---|---|
+| 64x64   | 201 | 259 | 1 | 0.150 | 186.9 |
+| 128x128 | 233 | 323 | 1 | 0.116 | 185.7 |
+| 256x256 | 297 | 451 | 1 | -0.002 | 181.75 |
 
-| Metric | Adder Tree (`conv_multi.v`) | Systolic Array (`conv_systolic.v`) |
-|---|---|---|
-| LUT | 201 | 579 |
-| FF (Flip-Flop) | 259 | 478 |
-| DSP | 1| 1 |
-| Clock Period used for measurement | 5.500 ns | 5.500 ns |
-| WNS at that period | 0.150 ns | 0.133 ns |
-| **Fmax** | **≈ 186.9 MHz** | **≈ 186.3 MHz** |
-| Pipeline Latency | 3 clock cycles | 10 clock cycles |
+Pipeline Latency: **3 clock cycles** (fixed, independent of image size)
 
-### 9.3 Verification Results
+### 8.3 Systolic Array (`conv_systolic.v`)
 
-<!-- Dien ket qua chay golden_model.py cho ca 2 kien truc vao bang duoi day -->
+| Image Size | LUT | FF | DSP | WNS (ns) | Fmax (MHz) |
+|---|---|---|---|---|---|
+| 64x64   | 579 | 478 | 1 | 0.133 | 186.3 |
+| 128x128 | 611 | 542 | 1 | -0.013 | 181.4 |
+| 256x256 | 671 | 670 | 1 | 0.037 | 183.05 |
 
-| Metric | Adder Tree | Systolic Array |
-|---|---|---|
-| Sharpen — Match Rate | *(điền số liệu)* | *(điền số liệu)* |
-| Sharpen — PSNR | *(điền số liệu)* | *(điền số liệu)* |
-| Blur — Match Rate | *(điền số liệu)* | *(điền số liệu)* |
-| Blur — PSNR | *(điền số liệu)* | *(điền số liệu)* |
+Pipeline Latency: **10 clock cycles** (fixed, independent of image size)
 
----
 
-## 10. Comparison & Trade-off Discussion
+## 9. Comparison & Trade-off Discussion
 
-<!-- Sau khi dien du so lieu o Muc 9, viet 2-3 nhan xet ghep cap uu/nhuoc diem o day.
-     Vi du (dien lai theo so lieu that cua ban):
-     - Systolic dat Fmax cao hon vi critical path chi con 1 phep nhan + 1 phep cong moi tang,
-       thay vi cong don 9 so trong 1 chu ky nhu adder tree - doi lai latency tang tu 3 len 10 chu ky.
-     - Adder tree dung it thanh ghi (FF) hon vi khong can 9 tang dang ky trung gian, nhung
-       critical path se dai ra nhanh hon khi mo rong kernel (5x5, 7x7...).
+### Adder Tree
+- Fewer LUT/FF than Systolic Array (no pixel-alignment shift-registers needed).
+- Lowest pipeline latency (3 cycles).
+- Fmax ≈ same as Systolic Array (see note below).
+
+### Systolic Array
+- More LUT/FF (~2.9× LUT, ~1.85× FF at 64x64) — mainly from `shift_delay` chains that align each pixel with its PE position.
+- Higher latency (10 cycles) — a deliberate trade-off for a shorter, size-independent critical path per stage.
+- Fmax ≈ same as Adder Tree (see note below).
+
+> **Note — why Fmax is nearly identical:** both cores share the same final blur stage (`sum × 114 >>> 10`), which is likely the true critical path — not the summation that differs between the two designs. At 3x3, the Adder Tree's summation (4 addition levels) is already fast enough that shortening it via the Systolic Array gives no measurable Fmax gain. This may change at larger kernels (5x5, 7x7), where the deeper Adder Tree summation could dominate the critical path instead.
 -->
 
 *(Viết nhận xét dựa trên số liệu thật ở Mục 9.2 và 9.3)*
 
 ---
 
-## 11. Limitations
+## 10. Limitations
 
 - Verified via RTL simulation and Vivado synthesis/implementation reports only; not yet deployed on physical FPGA hardware (no on-board Fmax/power measurement).
 - Kernel coefficients are hardcoded per mode (chosen via a `case`/mux internally); not yet runtime-configurable through a register interface.
-- Tested on 64x64 grayscale images only; RGB and larger resolutions not yet supported.
+- Tested on grayscale images only; RGB and larger resolutions not yet supported.
 - The pipeline has no explicit "image boundary" handling: the first ~2 rows of pixels are computed while the internal line buffers are still filling with reset (zero) values.
 - Fmax figures are derived from Vivado's static timing analysis (post-implementation), not measured on physical silicon; actual on-board Fmax may differ slightly due to temperature/voltage/process variation.
 
 ---
 
-## 12. Future Work
+## 11. Future Work
 
 - Gaussian Filter and Sobel Edge Detection support in both convolution core architectures.
 - Runtime-configurable convolution kernel (coefficients loaded via a register interface).

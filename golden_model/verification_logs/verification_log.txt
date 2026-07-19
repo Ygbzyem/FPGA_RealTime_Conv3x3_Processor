@@ -1,0 +1,108 @@
+[2026-07-19 16:22:08] 64x64_adder | Adder Tree | sharpen
+    Ket qua       : PASS
+    Match rate    : 97.1705%
+    Max abs error : 246
+    Mean abs error: 0.3422685529908166
+    PSNR (dB)     : 35.608
+    SSIM          : N/A
+    Pipeline offset da bu: 67 pixel
+------------------------------------------------------------
+[2026-07-19 16:22:09] 64x64_adder | Adder Tree | blur
+    Ket qua       : PASS
+    Match rate    : 96.8975%
+    Max abs error : 82
+    Mean abs error: 2.5170017374038225
+    PSNR (dB)     : 25.01
+    SSIM          : N/A
+    Pipeline offset da bu: 67 pixel
+------------------------------------------------------------
+[2026-07-19 16:23:11] 64x64_systolic | Systolic Array | sharpen
+    Ket qua       : PASS
+    Match rate    : 97.1705%
+    Max abs error : 246
+    Mean abs error: 0.3422685529908166
+    PSNR (dB)     : 35.608
+    SSIM          : N/A
+    Pipeline offset da bu: 67 pixel
+------------------------------------------------------------
+[2026-07-19 16:23:11] 64x64_systolic | Systolic Array | blur
+    Ket qua       : PASS
+    Match rate    : 96.8975%
+    Max abs error : 82
+    Mean abs error: 2.5170017374038225
+    PSNR (dB)     : 25.01
+    SSIM          : N/A
+    Pipeline offset da bu: 67 pixel
+------------------------------------------------------------
+[2026-07-19 16:23:28] 128x128_adder | Adder Tree | sharpen
+    Ket qua       : PASS
+    Match rate    : 98.468%
+    Max abs error : 16
+    Mean abs error: 0.15437150064603458
+    PSNR (dB)     : 46.185
+    SSIM          : N/A
+    Pipeline offset da bu: 131 pixel
+------------------------------------------------------------
+[2026-07-19 16:23:29] 128x128_adder | Adder Tree | blur
+    Ket qua       : PASS
+    Match rate    : 98.4434%
+    Max abs error : 83
+    Mean abs error: 1.2713960499600074
+    PSNR (dB)     : 27.957
+    SSIM          : N/A
+    Pipeline offset da bu: 131 pixel
+------------------------------------------------------------
+[2026-07-19 16:24:07] 128x128_systolic | Systolic Array | sharpen
+    Ket qua       : PASS
+    Match rate    : 98.468%
+    Max abs error : 16
+    Mean abs error: 0.15437150064603458
+    PSNR (dB)     : 46.185
+    SSIM          : N/A
+    Pipeline offset da bu: 131 pixel
+------------------------------------------------------------
+[2026-07-19 16:24:08] 128x128_systolic | Systolic Array | blur
+    Ket qua       : PASS
+    Match rate    : 98.4434%
+    Max abs error : 83
+    Mean abs error: 1.2713960499600074
+    PSNR (dB)     : 27.957
+    SSIM          : N/A
+    Pipeline offset da bu: 131 pixel
+------------------------------------------------------------
+[2026-07-19 16:24:29] 256x256_adder | Adder Tree | sharpen
+    Ket qua       : PASS
+    Match rate    : 99.2248%
+    Max abs error : 20
+    Mean abs error: 0.07757709453559447
+    PSNR (dB)     : 49.194
+    SSIM          : N/A
+    Pipeline offset da bu: 259 pixel
+------------------------------------------------------------
+[2026-07-19 16:24:32] 256x256_adder | Adder Tree | blur
+    Ket qua       : PASS
+    Match rate    : 99.2202%
+    Max abs error : 82
+    Mean abs error: 0.6380654748226787
+    PSNR (dB)     : 30.948
+    SSIM          : N/A
+    Pipeline offset da bu: 259 pixel
+------------------------------------------------------------
+[2026-07-19 16:25:05] 256x256_systolic | Systolic Array | sharpen
+    Ket qua       : PASS
+    Match rate    : 99.2248%
+    Max abs error : 20
+    Mean abs error: 0.07757709453559447
+    PSNR (dB)     : 49.194
+    SSIM          : N/A
+    Pipeline offset da bu: 259 pixel
+------------------------------------------------------------
+[2026-07-19 16:25:08] 256x256_systolic | Systolic Array | blur
+    Ket qua       : PASS
+    Match rate    : 99.2202%
+    Max abs error : 82
+    Mean abs error: 0.6380654748226787
+    PSNR (dB)     : 30.948
+    SSIM          : N/A
+    Pipeline offset da bu: 259 pixel
+------------------------------------------------------------
