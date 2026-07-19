@@ -6,7 +6,7 @@
 
 This project implements a real-time image processor on an FPGA using a 3x3 Convolution algorithm to perform common image filters such as Blur and Sharpening. The convolution core — the part of the system responsible for accumulating the 9 multiply results of the 3x3 window — is implemented in **two alternative hardware architectures**:
 
-1. **Adder Tree** (`conv_multi.v`): all 9 multiply-accumulate terms are summed combinationally in a single clock cycle using a tree of adders.
+1. **Adder Tree** (`conv_adder_tree.v`): all 9 multiply-accumulate terms are summed combinationally in a single clock cycle using a tree of adders.
 2. **Systolic Array** (`conv_systolic.v` + `systolic_pe.v` + `shift_delay.v`): the same 9-term accumulation is broken into a chain of 9 Processing Elements (PE), each performing exactly one multiply and one add per clock cycle.
 
 Both architectures are functionally equivalent (produce the same convolution result) but differ in critical path length, pipeline latency, and hardware resource usage — this trade-off is the central comparison of this project (see Section 8 onward).
@@ -16,8 +16,7 @@ Both architectures are functionally equivalent (produce the same convolution res
 - Understand how 3x3 convolution works and how it is implemented in RTL.
 - Understand how a combinational adder tree accumulator works, and its critical-path limitation as kernel size grows.
 - Understand how a systolic-array (single-MAC-per-stage) accumulator works, and how it trades latency for a shorter, size-independent critical path.
-- Compare both architectures quantitatively — hardware resource usage (LUT/FF/DSP) and maximum clock frequency (Fmax) — using Vivado synthesis and implementation reports.
-- Verify both architectures produce numerically correct convolution results using an independent Python golden model.
+- Compare both architectures quantitatively — hardware resource usage (LUT/FF/DSP) and maximum clock frequency (Fmax) — using Vivado synthesis and implementation reports, across multiple image resolutions (64x64, 128x128, 256x256).
 
 ---
 
@@ -39,7 +38,7 @@ Both architectures are functionally equivalent (produce the same convolution res
 
 ## 2. System Overview
 
-The system processes a 64x64 grayscale image through a real-time streaming pipeline:
+The system processes a grayscale image through a real-time streaming pipeline:
 
 - **Input:** A grayscale image is converted into raw pixel data (`.hex`/`.txt`) using a Python preprocessing script. This data is streamed into the FPGA one pixel per clock cycle through `i_pixel`, gated by `data_valid_in`.
 - **Buffering & Windowing:** The `line_buffer` module stores 2 previous rows of the image, and `window_3x3` combines them with the current pixel to form a 3x3 sliding window (`p11` to `p33`) at every clock cycle.
@@ -59,36 +58,52 @@ The system processes a 64x64 grayscale image through a real-time streaming pipel
 ```
 FPGA_RealTime_Conv3x3_Processor/
 ├── src/
-│   ├── common/                      # module dung chung cho ca 2 kien truc
+│   ├── common/
 │   │   ├── line_buffer.v
 │   │   └── window_3x3.v
-│   ├── adder_tree/                  # kien truc adder tree
-│   │   ├── conv_multi.v
-│   │   └── top_module.v             # ban goi conv_multi
-│   └── systolic/                    # kien truc systolic
+│   ├── adder_tree/
+│   │   ├── conv_adder_tree.v
+│   │   └── top_module.v
+│   └── systolic/
 │       ├── shift_delay.v
 │       ├── systolic_pe.v
 │       ├── conv_systolic.v
-│       └── top_module.v             # ban goi conv_systolic
+│       └── top_module.v
 ├── constraints/
-│   └── constraints.xdc              # dung chung cho ca 2 project Vivado
+│   └── constraints.xdc
 ├── testbench/
-│   └── testbench_prj.v              # dung chung, khong doi
+│   └── testbench_prj.v
 ├── golden_model/
-│   └── golden_model.py
+│   ├── golden_model.py
+│   ├── compare_my_image.py
+│   └── verification_logs/
+│       ├── verification_log.csv
+│       └── verification_log.txt
 ├── scripts/
 │   ├── image_to_hex.py
 │   └── hex_to_image.py
 ├── results/
-│   ├── adder_tree/
-│   │   ├── utilization_report.txt   # xuat tu Vivado (Report Utilization)
-│   │   ├── timing_summary.txt       # xuat tu Vivado (Report Timing Summary)
-│   │   └── output_sharp.hex, output_blur.hex
-│   ├── systolic/
-│   │   ├── utilization_report.txt
-│   │   ├── timing_summary.txt
-│   │   └── output_sharp.hex, output_blur.hex
-│   └── comparison_table.md          # bang so sanh cuoi cung cho paper
+│   ├── 64x64/
+│   │   ├── adder_tree/
+│   │   │   ├── top_module_utilization_synth_64x64.rpt
+│   │   │   ├── input_data_64.hex
+│   │   │   ├── output_sharp_64.hex
+│   │   │   └── output_blur_64.hex
+│   │   └── systolic/
+│   │       ├── top_module_utilization_synth_64x64.rpt
+│   │       ├── input_data_64.hex
+│   │       ├── output_sharp_64.hex
+│   │       └── output_blur_64.hex
+│   ├── 128x128/
+│   │   ├── adder_tree/
+│   │   │   └── ...
+│   │   └── systolic/
+│   │       └── ...
+│   ├── 256x256/
+│       ├── adder_tree/
+│       │   └── ...
+│       └── systolic/
+│           └── ...
 ├── image/
 └── README.md
 ```
@@ -102,8 +117,8 @@ FPGA_RealTime_Conv3x3_Processor/
 | 1 | `top_module`     | `top_module.v`     | The highest-level top module, connecting the entire system on the FPGA.                                     |
 | 2 | `line_buffer`    | `line_buffer.v`    | Stores 2 lines of image data. Converts serial pixel data into a 3x3 matrix.                                  |
 | 3 | `window_3x3`     | `window_3x3.v`     | Extracts a 3x3 pixel window (p11 to p33) from the Line Buffer to feed into the convolution core.             |
-| 4 | `conv_multi`     | `conv_multi.v`     | Convolution core — **Adder Tree** architecture. Selects Sharpen/Blur kernel via `mode`, accumulates via a combinational adder tree. |
-| 5 | `conv_systolic`  | `conv_systolic.v`  | Convolution core — **Systolic Array** architecture. Same interface as `conv_multi`, accumulates via a chain of 9 Processing Elements. |
+| 4 | `conv_adder_tree` | `conv_adder_tree.v` | Convolution core — **Adder Tree** architecture. Selects Sharpen/Blur kernel via `mode`, accumulates via a combinational adder tree. |
+| 5 | `conv_systolic`  | `conv_systolic.v`  | Convolution core — **Systolic Array** architecture. Same interface as `conv_adder_tree`, accumulates via a chain of 9 Processing Elements. |
 | 6 | `systolic_pe`    | `systolic_pe.v`    | A single Processing Element used by `conv_systolic`: performs one multiply and one add per clock cycle.      |
 | 7 | `shift_delay`    | `shift_delay.v`    | Generic N-cycle delay utility, used by `conv_systolic` to align pixel/mode/valid timing across the PE chain. |
 | 8 | `testbench_prj`  | `testbench_prj.v`  | Simulation testbench: loads images from Python, drives the DUT, and writes output data for verification.     |
@@ -157,7 +172,7 @@ The convolution core is the only stage that differs between the two architecture
 
 #### 6.4.1 Adder Tree — `conv_adder_tree.v`
 
-![conv_multi (Adder Tree) structure](image/TEN_ANH_CONV_MULTI.png)
+![conv_adder_tree structure](image/TEN_ANH_CONV_MULTI.png)
 
 | # | Gate             | Type   | Bit-width | Description                                      |
 | --- | ---------------- | ------ | --------- | -------------------------------------------------- |
@@ -173,12 +188,12 @@ The convolution core is the only stage that differs between the two architecture
 
 #### 6.4.2 Systolic Array
 
+![Systolic Array overview](image/TEN_ANH_SYSTOLIC_OVERVIEW.png)
 
 **How it works:** instead of summing all 9 terms in one cycle, the accumulation is broken into a chain of 9 Processing Elements (PE). Each PE performs exactly one multiply and one add per clock cycle, then registers the partial sum before passing it to the next PE. Because a new 3x3 window arrives every clock cycle (not every 9 cycles), each pixel/mode/valid signal must be delayed by an amount matching its position in the chain (handled by `shift_delay.v`) so that every PE always operates on data from the *same* window. Total pipeline latency: **10 clock cycles** (9 PE stages + 1 final output/clipping stage).
 
 ##### 6.4.2.1 `conv_systolic.v`
 
-<!-- Dan anh so do chi tiet cua conv_systolic.v (bao gom cac khoi shift_delay va chuoi PE) vao day -->
 ![conv_systolic.v structure](image/TEN_ANH_CONV_SYSTOLIC.png)
 
 | # | Gate             | Type   | Bit-width | Description                                      |
@@ -193,7 +208,6 @@ The convolution core is the only stage that differs between the two architecture
 
 ##### 6.4.2.2 `systolic_pe.v`
 
-<!-- Dan anh so do 1 Processing Element vao day -->
 ![systolic_pe.v structure](image/TEN_ANH_SYSTOLIC_PE.png)
 
 | # | Gate                 | Type   | Bit-width         | Description                                                        |
@@ -208,7 +222,6 @@ The convolution core is the only stage that differs between the two architecture
 
 ##### 6.4.2.3 `shift_delay.v`
 
-<!-- Dan anh so do khoi cua shift_delay vao day -->
 ![shift_delay.v structure](image/TEN_ANH_SHIFT_DELAY.png)
 
 | # | Gate       | Type   | Bit-width       | Description                                          |
@@ -231,7 +244,7 @@ The convolution core is the only stage that differs between the two architecture
 
 - **Data Buffering:** `line_buffer.v` receives single pixels and shifts them through register stages to form 2 line buffers.
 - **3x3 Window Generation:** `window_3x3.v` combines line buffer data with the current pixel to extract the 3x3 window (`p11` to `p33`).
-- **Convolution Calculation:** The 3x3 window is sent to the convolution core (either `conv_multi.v` or `conv_systolic.v`, depending on which architecture is instantiated in `top_module.v`), which selects the kernel coefficients based on `mode` and accumulates the result.
+- **Convolution Calculation:** The 3x3 window is sent to the convolution core (either `conv_adder_tree.v` or `conv_systolic.v`, depending on which architecture is instantiated in `top_module.v`), which selects the kernel coefficients based on `mode` and accumulates the result.
 
 ### 3. Output Stage
 
@@ -250,14 +263,14 @@ Fmax is derived from Vivado's Timing Summary report after implementation, using:
 Fmax = 1 / (Clock Period − WNS)
 ```
 
-where **WNS (Worst Negative Slack)** is read directly from the Design Timing Summary. The clock period constraint was iteratively tightened until WNS approached zero, to obtain an accurate Fmax estimate rather than relying on a single loosely-constrained run.
+where **WNS (Worst Negative Slack)** is read directly from the Design Timing Summary. The same clock constraint file (`constraints.xdc`, 5.500 ns period) was used across all image sizes and both architectures, so the resulting Fmax values are directly comparable.
 
-### 8.2 Adder Tree (`conv_multi.v`)
+### 8.2 Adder Tree (`conv_adder_tree.v`)
 
 | Image Size | LUT | FF | DSP | WNS (ns) | Fmax (MHz) |
 |---|---|---|---|---|---|
-| 64x64   | 201 | 259 | 1 | 0.150 | 186.9 |
-| 128x128 | 233 | 323 | 1 | 0.116 | 185.7 |
+| 64x64   | 201 | 259 | 1 | 0.150  | 186.9 |
+| 128x128 | 233 | 323 | 1 | 0.116  | 185.7 |
 | 256x256 | 297 | 451 | 1 | -0.002 | 181.75 |
 
 Pipeline Latency: **3 clock cycles** (fixed, independent of image size)
@@ -266,29 +279,28 @@ Pipeline Latency: **3 clock cycles** (fixed, independent of image size)
 
 | Image Size | LUT | FF | DSP | WNS (ns) | Fmax (MHz) |
 |---|---|---|---|---|---|
-| 64x64   | 579 | 478 | 1 | 0.133 | 186.3 |
+| 64x64   | 579 | 478 | 1 | 0.133  | 186.3 |
 | 128x128 | 611 | 542 | 1 | -0.013 | 181.4 |
-| 256x256 | 671 | 670 | 1 | 0.037 | 183.05 |
+| 256x256 | 671 | 670 | 1 | 0.037  | 183.05 |
 
 Pipeline Latency: **10 clock cycles** (fixed, independent of image size)
 
+---
 
 ## 9. Comparison & Trade-off Discussion
 
 ### Adder Tree
-- Fewer LUT/FF than Systolic Array (no pixel-alignment shift-registers needed).
-- Lowest pipeline latency (3 cycles).
-- Fmax ≈ same as Systolic Array (see note below).
+- Fewer LUT/FF than Systolic Array at every tested image size — no pixel-alignment shift-registers needed.
+- Lowest pipeline latency (3 cycles), independent of image size.
+- Fmax stays close to the Systolic Array's at every size (see note below).
 
 ### Systolic Array
-- More LUT/FF (~2.9× LUT, ~1.85× FF at 64x64) — mainly from `shift_delay` chains that align each pixel with its PE position.
+- More LUT/FF than Adder Tree — mainly from the `shift_delay` chains needed to align each of the 9 pixels with its position in the PE chain.
 - Higher latency (10 cycles) — a deliberate trade-off for a shorter, size-independent critical path per stage.
-- Fmax ≈ same as Adder Tree (see note below).
+- Fmax stays close to the Adder Tree's at every size (see note below).
+- **The relative LUT/FF overhead shrinks as image size grows** — 2.88×/1.85× at 64x64, down to 2.62×/1.68× at 128x128, and 2.26×/1.49× at 256x256 (Systolic vs Adder Tree). This is expected: the `shift_delay` alignment chains are sized by the *kernel* (fixed at 9 positions), not by image size, while `line_buffer`'s cost — shared by both architectures — grows with image width. As image size increases, this common, growing cost dilutes the fixed overhead that is unique to the Systolic Array.
 
-> **Note — why Fmax is nearly identical:** both cores share the same final blur stage (`sum × 114 >>> 10`), which is likely the true critical path — not the summation that differs between the two designs. At 3x3, the Adder Tree's summation (4 addition levels) is already fast enough that shortening it via the Systolic Array gives no measurable Fmax gain. This may change at larger kernels (5x5, 7x7), where the deeper Adder Tree summation could dominate the critical path instead.
--->
-
-*(Viết nhận xét dựa trên số liệu thật ở Mục 9.2 và 9.3)*
+> **Note — why Fmax is nearly identical:** both cores share the same final blur stage (`sum × 114 >>> 10`), which is likely the true critical path — not the summation that differs between the two designs. At a 3x3 kernel, the Adder Tree's summation (4 addition levels) is already fast enough that shortening it via the Systolic Array gives no measurable Fmax gain. This may change at larger kernels (5x5, 7x7), where the deeper Adder Tree summation could dominate the critical path instead.
 
 ---
 
@@ -296,7 +308,7 @@ Pipeline Latency: **10 clock cycles** (fixed, independent of image size)
 
 - Verified via RTL simulation and Vivado synthesis/implementation reports only; not yet deployed on physical FPGA hardware (no on-board Fmax/power measurement).
 - Kernel coefficients are hardcoded per mode (chosen via a `case`/mux internally); not yet runtime-configurable through a register interface.
-- Tested on grayscale images only; RGB and larger resolutions not yet supported.
+- Tested on grayscale images only; RGB is not yet supported.
 - The pipeline has no explicit "image boundary" handling: the first ~2 rows of pixels are computed while the internal line buffers are still filling with reset (zero) values.
 - Fmax figures are derived from Vivado's static timing analysis (post-implementation), not measured on physical silicon; actual on-board Fmax may differ slightly due to temperature/voltage/process variation.
 
