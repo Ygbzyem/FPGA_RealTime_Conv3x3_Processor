@@ -1,4 +1,4 @@
-# References
+## References
 
 [1] K. Guo, S. Zeng, J. Yu, Y. Wang, and H. Yang, "A survey of FPGA-based neural network inference accelerators," ACM Trans. Reconfigurable Technol. Syst., vol. 12, no. 1, pp. 1-26, 2019.
 
