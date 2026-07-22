@@ -58,53 +58,55 @@ The system processes a grayscale image through a real-time streaming pipeline:
 ```
 FPGA_RealTime_Conv3x3_Processor/
 ├── src/
-│   ├── common/
-│   │   ├── line_buffer.v
-│   │   └── window_3x3.v
-│   ├── adder_tree/
-│   │   ├── conv_adder_tree.v
-│   │   └── top_module.v
-│   └── systolic/
-│       ├── shift_delay.v
-│       ├── systolic_pe.v
-│       ├── conv_systolic.v
-│       └── top_module.v
+│   ├── common/                           # shared by both architectures
+│   │   ├── line_buffer.v                       # Save the previous two image lines using the shift register.
+│   │   └── window_3x3.v                        # Create a 3x3 sliding window from line buffer data
+│   ├── adder_tree/                       # Adder Tree Architecture (combining addition of 1 cycle)
+│   │   ├── conv_adder_tree.v                   # Convolution core: cumulatively add 9 terms using an addition tree
+│   │   └── top_module.v                        # Top-level calls conv_adder_tree_inst
+│   └── systolic/                         # Systolic Array Architecture (9 PE arrays in series)
+│       ├── shift_delay.v                       # Periodic signal delay module (time adjustment)
+│       ├── systolic_pe.v                       # 1 Processing Element: 1 multiplication + 1 adder
+│       ├── conv_systolic.v                     # Convolution core: combine 9 PEs into a chain
+│       └── top_module.v                        # Top-level calls conv_systolic_inst
 ├── constraints/
-│   └── constraints.xdc
+│   └── constraints.xdc                    # shared by both Vivado projects
 ├── testbench/
-│   └── testbench_prj.v
-├── golden_model/
-│   ├── golden_model.py
-│   ├── compare_my_image.py
+│   └── testbench_64x64.v                       # use for 64x64 image hex file
+    └── testbench_128x128.v                     # use for 128x128 image hex file
+    └── testbench_256x256.v                     # use for 256x256 image hex file
+├── golden_model/                         # Python Verification Tool
+│   ├── golden_model.py                         # Main library: simulates the algorithm exactly as in RTL
+│   ├── compare_my_image.py                     # Live script execution: compare real images with RTL
 │   └── verification_logs/
-│       ├── verification_log.csv
-│       └── verification_log.txt
+│       ├── verification_log.csv                # Excel Summary Table of Pass/Fail Results
+│       └── verification_log.txt                # Text-based log
 ├── scripts/
-│   ├── image_to_hex.py
-│   └── hex_to_image.py
+│   ├── image_to_hex                   # Convert original image (.png/.jpg) to a .hex file for loading into RTL
+│   └── hex_to_image                   # Convert the .hex file (RTL output) into a viewable image.
 ├── results/
-│   ├── 64x64/
+│   ├── 64x64/                         # Results at 64x64 resolution
 │   │   ├── adder_tree/
 │   │   │   ├── top_module_utilization_synth_64x64.rpt
-│   │   │   ├── input_data_64.hex
-│   │   │   ├── output_sharp_64.hex
-│   │   │   └── output_blur_64.hex
+│   │   │   ├── input_data_64.hex               # Input image in hex format
+│   │   │   ├── output_sharp_64.hex             # RTL Result — Sharpen Mode
+│   │   │   └── output_blur_64.hexq             # RTL Result — Blur Mode
 │   │   └── systolic/
 │   │       ├── top_module_utilization_synth_64x64.rpt
-│   │       ├── input_data_64.hex
-│   │       ├── output_sharp_64.hex
-│   │       └── output_blur_64.hex
-│   ├── 128x128/
+│   │       ├── input_data_64.hex               # Input image in hex format
+│   │       ├── output_sharp_64.hex             # RTL Result — Sharpen Mode
+│   │       └── output_blur_64.hex              # RTL Result — Blur Mode
+│   ├── 128x128/                        # Results at 128×128 resolution
 │   │   ├── adder_tree/
 │   │   │   └── ...
 │   │   └── systolic/
-│   │       └── ...
-│   ├── 256x256/
+│   │       └── ... 
+│   ├── 256x256/                        # Results at 256x256 resolution
 │       ├── adder_tree/
 │       │   └── ...
 │       └── systolic/
 │           └── ...
-├── image/
+├── image/                                  # test images + block diagram
 └── README.md
 ```
 
