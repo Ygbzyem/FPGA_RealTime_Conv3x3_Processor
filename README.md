@@ -45,11 +45,11 @@ The system processes a grayscale image through a real-time streaming pipeline:
 - **Convolution:** The 3x3 window is passed to the convolution core, which multiplies each pixel by its corresponding kernel coefficient (selected by the `mode` signal — Sharpen or Blur) and accumulates the 9 products into a single result. **This is the stage where the Adder Tree and Systolic Array architectures differ** — everything before and after this stage (`line_buffer`, `window_3x3`, output handling) is identical between both versions.
 - **Output:** The resulting pixel is output through `o_pixel`, synchronized with `data_valid_out`. A Python postprocessing script reconstructs the output pixel stream back into a viewable image.
 ---
-### Mathematically, the Convolution stage above computes 2D discrete convolution over a 3×3 kernel, defined as: 
+**Mathematically, the Convolution stage above computes 2D discrete convolution over a 3×3 kernel, defined as:** 
 
 ![Convolution General Formula](image/Convolution_General_Formula.png)
 
-    **Note** : where x(i+m, j+n) is a pixel of the input image within the 3×3 window centered at (i, j), w(m, n) is the kernel/filter coefficient at position (m, n), and y(i, j) is the output pixel after convolution. Section 6.4 describes how the Adder Tree and Systolic Array architectures each compute this same formula using structurally different hardware.
+**Note:**  where x(i+m, j+n) is a pixel of the input image within the 3×3 window centered at (i, j), w(m, n) is the kernel/filter coefficient at position (m, n), and y(i, j) is the output pixel after convolution. Section 6.4 describes how the Adder Tree and Systolic Array architectures each compute this same formula using structurally different hardware.
 ---
 
 ## 3. General Block Diagram
